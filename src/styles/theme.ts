@@ -86,6 +86,7 @@ export const zIndex = {
   content: 10,
   buttons: 20,
   celebration: 100,
+  mobileBlocker: 150,
   confetti: 200,
 } as const;
 

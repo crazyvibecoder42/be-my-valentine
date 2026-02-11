@@ -4,14 +4,18 @@ import ButtonContainer from './components/ValentineButtons/ButtonContainer';
 import YesButton from './components/ValentineButtons/YesButton';
 import NoButton from './components/ValentineButtons/NoButton';
 import CelebrationAnimation from './components/CelebrationScreen/CelebrationAnimation';
+import MobileBlockerScreen from './components/MobileBlocker/MobileBlockerScreen';
 import useCelebration from './hooks/useCelebration';
+import { useDeviceDetection } from './hooks/useDeviceDetection';
 import { theme } from './styles/theme';
 
 /**
  * Main App Component
  * Valentine's Day website with interactive buttons and celebration
+ * Includes mobile/tablet detection to show blocker screen for non-desktop users
  */
 export default function App() {
+  const { isDesktop } = useDeviceDetection();
   const { showCelebration, triggerCelebration } = useCelebration();
 
   const handleYesClick = async () => {
@@ -19,6 +23,30 @@ export default function App() {
     await triggerCelebration();
   };
 
+  // Early return for mobile/tablet users - show blocker screen
+  if (!isDesktop) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          background: theme.gradients.background,
+        }}
+      >
+        {/* Background floating hearts - maintain Valentine's ambiance */}
+        <FloatingHearts />
+
+        {/* Mobile blocker screen */}
+        <MobileBlockerScreen />
+      </div>
+    );
+  }
+
+  // Desktop experience - full valentine buttons and celebration
   return (
     <div
       style={{
