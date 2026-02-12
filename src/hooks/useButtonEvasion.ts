@@ -21,6 +21,7 @@ interface UseButtonEvasionOptions {
   buttonRef: RefObject<HTMLButtonElement | null>;
   buttonSize: ButtonSize;
   evasionRadius?: number;
+  disabled?: boolean;
 }
 
 /**
@@ -35,11 +36,18 @@ export function useButtonEvasion({
   buttonRef,
   buttonSize,
   evasionRadius = EVASION_RADIUS,
+  disabled = false,
 }: UseButtonEvasionOptions): ButtonPosition {
   const mousePosition = useMousePosition();
   const [buttonPosition, setButtonPosition] = useState<ButtonPosition>({ x: 0, y: 0 });
 
   useEffect(() => {
+    // Skip evasion if disabled
+    if (disabled) {
+      setButtonPosition({ x: 0, y: 0 });
+      return;
+    }
+
     // Get button element reference
     if (!buttonRef.current) return;
 
@@ -85,7 +93,7 @@ export function useButtonEvasion({
     }
     // Note: buttonSize and evasionRadius omitted from deps - they're constants
     // Including them would cause infinite re-renders due to object literal recreation
-  }, [mousePosition, buttonRef]);
+  }, [mousePosition, buttonRef, disabled]);
 
   return buttonPosition;
 }

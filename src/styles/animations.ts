@@ -53,7 +53,7 @@ export const buttonVariants = {
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: easings.easeInOut,
     },
   },
 };
@@ -68,10 +68,9 @@ export const celebrationVariants = {
     scale: 1,
     opacity: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       damping: 20,
       stiffness: 300,
-      duration: 0.8,
     },
   },
 };
@@ -97,7 +96,7 @@ export const floatingHeartVariants = {
     transition: {
       duration: 5,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: easings.easeInOut,
     },
   },
 };
@@ -114,7 +113,7 @@ export const sparkleVariants = {
     transition: {
       duration: 1.5,
       repeat: Infinity,
-      ease: 'easeInOut',
+      ease: easings.easeInOut,
     },
   },
 };
@@ -171,3 +170,105 @@ export const getLetterAnimation = (index: number) => ({
   duration: 0.3,
   ease: easings.easeOut,
 });
+
+/**
+ * Marble Theme Animations
+ * Gentle, graceful spring physics for sophisticated aesthetic
+ */
+
+// Marble spring configuration - slower and more graceful
+export const marbleSpring = {
+  type: 'spring' as const,
+  damping: 30,
+  stiffness: 200,
+} as const;
+
+// Marble animation variants
+export const marbleVariants = {
+  // Fade in animation
+  fadeIn: {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: easings.easeOut,
+      },
+    },
+  },
+
+  // Scale in animation
+  scaleIn: {
+    hidden: {
+      scale: 0.9,
+      opacity: 0,
+    },
+    visible: {
+      scale: 1,
+      opacity: 1,
+      transition: marbleSpring,
+    },
+  },
+
+  // Slide up animation
+  slideUp: {
+    hidden: {
+      y: 40,
+      opacity: 0,
+    },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: marbleSpring,
+    },
+  },
+
+  // Gentle button hover
+  button: {
+    initial: {
+      scale: 1,
+    },
+    hover: {
+      scale: 1.02,
+      transition: marbleSpring,
+    },
+    tap: {
+      scale: 0.98,
+      transition: marbleSpring,
+    },
+  },
+
+  // Glass panel entrance
+  glassPanel: {
+    hidden: {
+      opacity: 0,
+      y: 30,
+      scale: 0.95,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        ...marbleSpring,
+        duration: 1.2,
+      },
+    },
+  },
+
+  // Graceful container stagger
+  container: {
+    hidden: {
+      opacity: 0,
+    },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  },
+} as const;

@@ -8,25 +8,30 @@ import { useButtonEvasion } from '../../hooks/useButtonEvasion';
 const BUTTON_WIDTH = 120;
 const BUTTON_HEIGHT = 50;
 
+interface NoButtonProps {
+  scale?: number;
+}
+
 /**
  * NoButton - Small "No" button that evades the mouse cursor
  * Uses vector math and Framer Motion for smooth, playful evasion behavior
  * Tracks real DOM position for accurate distance calculations
  */
-export default function NoButton() {
+export default function NoButton({ scale = 1 }: NoButtonProps) {
   // Create ref for button element to track real position
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Get evasion position from hook
+  // Get evasion position from hook - disable evasion during growth
   const position = useButtonEvasion({
     buttonRef,
     buttonSize: { width: BUTTON_WIDTH, height: BUTTON_HEIGHT },
+    disabled: scale !== 1,
   });
 
   return (
     <motion.button
       ref={buttonRef}
-      animate={{ x: position.x, y: position.y }}
+      animate={{ x: position.x, y: position.y, scale }}
       transition={{
         type: 'spring',
         damping: 20,

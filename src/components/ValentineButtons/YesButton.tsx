@@ -4,22 +4,24 @@ import { buttonVariants } from '../../styles/animations';
 
 interface YesButtonProps {
   onClick: () => void;
+  scale?: number;
 }
 
 /**
  * YesButton - Large "Yes I will be your valentine" button
  * Features hover effects, breathing animation, and celebration trigger
  */
-export default function YesButton({ onClick }: YesButtonProps) {
+export default function YesButton({ onClick, scale = 1 }: YesButtonProps) {
   return (
     <motion.button
       onClick={onClick}
       variants={buttonVariants}
       initial="initial"
-      animate="pulse"
+      animate={scale === 1 ? "pulse" : { scale }}
       whileHover="hover"
       whileTap="tap"
       style={{
+        zIndex: scale > 1 ? 1000 : 1,
         minWidth: '300px',
         height: '80px',
         padding: '20px 40px',

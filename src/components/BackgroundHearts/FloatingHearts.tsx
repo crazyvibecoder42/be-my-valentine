@@ -13,6 +13,10 @@ interface Heart {
   uniqueKey: string; // For AnimatePresence tracking
 }
 
+interface FloatingHeartsProps {
+  onAllHeartsPoppedCallback?: () => void;
+}
+
 /**
  * Plays the balloon pop sound from audio file
  */
@@ -32,8 +36,10 @@ const playPopSound = () => {
  * FloatingHearts - Ambient heart particles in the background
  * Creates 20 randomly positioned hearts with gentle floating animation
  * One heart pops like a balloon every 4 seconds with sound (disappears permanently)
+ *
+ * @param onAllHeartsPoppedCallback - Called when all hearts have been popped
  */
-export default function FloatingHearts() {
+export default function FloatingHearts({ onAllHeartsPoppedCallback }: FloatingHeartsProps = {}) {
   // Generate initial hearts
   const [hearts, setHearts] = useState<Heart[]>(() =>
     Array.from({ length: 20 }, (_, i) => ({
@@ -49,6 +55,7 @@ export default function FloatingHearts() {
   );
 
   const [poppingId, setPoppingId] = useState<number | null>(null);
+  const [allPoppedCallbackFired, setAllPoppedCallbackFired] = useState(false);
 
   // Pop a random heart every 4 seconds
   useEffect(() => {
@@ -69,9 +76,7 @@ export default function FloatingHearts() {
 
         // After pop animation completes (600ms), remove the heart permanently
         setTimeout(() => {
-          setHearts(prevHearts =>
-            prevHearts.filter(h => h.id !== heartToPop.id)
-          );
+          setHearts(prevHearts => prevHearts.filter(h => h.id !== heartToPop.id));
           setPoppingId(null);
         }, 600);
 
@@ -81,6 +86,15 @@ export default function FloatingHearts() {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Trigger callback when all hearts are popped (separate effect to avoid render-during-render)
+  useEffect(() => {
+    if (hearts.length === 0 && !allPoppedCallbackFired) {
+      console.log('[FloatingHearts] All hearts popped! Triggering callback');
+      setAllPoppedCallbackFired(true);
+      onAllHeartsPoppedCallback?.();
+    }
+  }, [hearts.length, allPoppedCallbackFired, onAllHeartsPoppedCallback]);
 
   return (
     <div
