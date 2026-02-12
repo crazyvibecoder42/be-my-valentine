@@ -20,8 +20,9 @@ export default function YesButton({ onClick }: YesButtonProps) {
       whileHover="hover"
       whileTap="tap"
       style={{
-        width: '300px',
+        minWidth: '300px',
         height: '80px',
+        padding: '20px 40px',
         background: theme.gradients.yesButton,
         color: 'white',
         fontSize: theme.typography.sizes.lg,
@@ -33,6 +34,9 @@ export default function YesButton({ onClick }: YesButtonProps) {
         fontFamily: theme.typography.fonts.body,
         position: 'relative',
         overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       {/* Glow effect on hover */}
