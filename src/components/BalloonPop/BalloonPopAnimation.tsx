@@ -7,40 +7,14 @@ interface BalloonPopAnimationProps {
 }
 
 /**
- * Plays the balloon pop sound from audio file
- * Reused from FloatingHearts.tsx (lines 19-29)
- */
-const playPopSound = () => {
-  try {
-    const audio = new Audio('/pop-sound.mp3');
-    audio.volume = 0.5; // Set volume to 50%
-    audio.play().catch(error => {
-      console.warn('Failed to play pop sound:', error);
-    });
-  } catch (error) {
-    console.warn('Audio playback not supported:', error);
-  }
-};
-
-/**
  * BalloonPopAnimation - Transition animation from grown Yes button to marble screen
  *
  * Animation sequence (600ms total):
- * 1. Button inflates slightly (scale 1.1, 200ms)
- * 2. Button pops with burst particles (8 particles radiating outward, 400ms)
- * 3. Play pop sound from /public/pop-sound.mp3
- * 4. Fade to marble background (400ms, delay 200ms)
- * 5. Call completion callback
+ * 1. Burst particles radiate outward (8 particles, 400ms)
+ * 2. Fade to marble background (400ms, delay 200ms)
+ * 3. Call completion callback
  */
 export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationProps) {
-  // Play pop sound when animation starts (at 200ms - when pop begins)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      playPopSound();
-    }, 200);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Call onComplete after full animation sequence (600ms)
   useEffect(() => {
@@ -66,26 +40,6 @@ export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationP
         pointerEvents: 'none',
       }}
     >
-      {/* Balloon (Yes button representation) */}
-      <motion.div
-        style={{
-          fontSize: '120px',
-          position: 'relative',
-        }}
-        initial={{ scale: 1, opacity: 1 }}
-        animate={{
-          scale: [1, 1.1, 1.1, 1.4, 0.2],
-          opacity: [1, 1, 1, 1, 0],
-        }}
-        transition={{
-          duration: 0.6,
-          times: [0, 0.33, 0.33, 0.67, 1],
-          ease: [0.65, 0, 0.35, 1],
-        }}
-      >
-        🎈
-      </motion.div>
-
       {/* Burst particles (8 particles radiating at 45-degree intervals) */}
       {[...Array(8)].map((_, i) => {
         const angle = i * 45; // 0, 45, 90, 135, 180, 225, 270, 315 degrees
