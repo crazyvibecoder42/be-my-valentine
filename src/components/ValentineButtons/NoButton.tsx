@@ -23,8 +23,9 @@ export default function NoButton({ scale = 1, stage = 'initial' }: NoButtonProps
   // Create ref for button element to track real position
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Disable evasion during animation stages and after
-  const shouldDisableEvasion = stage === 'no-shrinking' || stage === 'yes-growing' || stage === 'yes-popped' || stage === 'marble-screen' || stage === 'celebrating';
+  // Keep evasion active during no-shrinking so button dodges while shrinking
+  // Only disable after No button vanishes
+  const shouldDisableEvasion = stage === 'yes-growing' || stage === 'yes-popped' || stage === 'marble-screen' || stage === 'celebrating';
 
   // Get evasion position from hook
   const position = useButtonEvasion({

@@ -109,7 +109,7 @@ export default function App() {
         {/* Animation stages: No button shrinking, then Yes button growing */}
         {(stage === 'no-shrinking' || stage === 'yes-growing') && (
           <div
-            key="animation-stage"
+            key="initial-stage"
             style={{
               position: 'relative',
               zIndex: theme.zIndex.content,
