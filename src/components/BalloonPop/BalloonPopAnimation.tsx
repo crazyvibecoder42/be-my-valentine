@@ -7,14 +7,34 @@ interface BalloonPopAnimationProps {
 }
 
 /**
+ * Plays the balloon pop sound from audio file
+ */
+const playPopSound = () => {
+  try {
+    const audio = new Audio('/pop-sound.mp3');
+    audio.volume = 0.5; // Set volume to 50%
+    audio.play().catch(error => {
+      console.warn('Failed to play pop sound:', error);
+    });
+  } catch (error) {
+    console.warn('Audio playback not supported:', error);
+  }
+};
+
+/**
  * BalloonPopAnimation - Transition animation from grown Yes button to marble screen
  *
  * Animation sequence (600ms total):
- * 1. Burst particles radiate outward (8 particles, 400ms)
- * 2. Fade to marble background (400ms, delay 200ms)
- * 3. Call completion callback
+ * 1. Play pop sound immediately
+ * 2. Burst particles radiate outward (8 particles, 400ms)
+ * 3. Fade to marble background (400ms, delay 200ms)
+ * 4. Call completion callback
  */
 export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationProps) {
+  // Play pop sound when animation starts
+  useEffect(() => {
+    playPopSound();
+  }, []);
 
   // Call onComplete after full animation sequence (600ms)
   useEffect(() => {

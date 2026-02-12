@@ -57,31 +57,51 @@ export default function FloatingHearts({ onAllHeartsPoppedCallback }: FloatingHe
   const [poppingId, setPoppingId] = useState<number | null>(null);
   const [allPoppedCallbackFired, setAllPoppedCallbackFired] = useState(false);
 
-  // Pop a random heart every 4 seconds
+  // Helper function to pop a single random heart
+  const popRandomHeart = () => {
+    setHearts(currentHearts => {
+      // Stop if no hearts left
+      if (currentHearts.length === 0) {
+        return currentHearts;
+      }
+
+      const randomIndex = Math.floor(Math.random() * currentHearts.length);
+      const heartToPop = currentHearts[randomIndex];
+
+      setPoppingId(heartToPop.id);
+
+      // Play pop sound
+      playPopSound();
+
+      // After pop animation completes (600ms), remove the heart permanently
+      setTimeout(() => {
+        setHearts(prevHearts => prevHearts.filter(h => h.id !== heartToPop.id));
+        setPoppingId(null);
+      }, 600);
+
+      return currentHearts;
+    });
+  };
+
+  // Pop hearts every 4 seconds (occasionally 2-3 hearts in quick succession)
   useEffect(() => {
     const interval = setInterval(() => {
-      setHearts(currentHearts => {
-        // Stop if no hearts left
-        if (currentHearts.length === 0) {
-          return currentHearts;
+      // 15% chance to pop multiple hearts quickly
+      const shouldPopMultiple = Math.random() < 0.15;
+
+      if (shouldPopMultiple) {
+        // Pop 2-3 hearts with 250ms delay between each
+        const heartCount = Math.floor(Math.random() * 2) + 2; // 2 or 3 hearts
+
+        for (let i = 0; i < heartCount; i++) {
+          setTimeout(() => {
+            popRandomHeart();
+          }, i * 250); // 250ms delay between each pop
         }
-
-        const randomIndex = Math.floor(Math.random() * currentHearts.length);
-        const heartToPop = currentHearts[randomIndex];
-
-        setPoppingId(heartToPop.id);
-
-        // Play pop sound
-        playPopSound();
-
-        // After pop animation completes (600ms), remove the heart permanently
-        setTimeout(() => {
-          setHearts(prevHearts => prevHearts.filter(h => h.id !== heartToPop.id));
-          setPoppingId(null);
-        }, 600);
-
-        return currentHearts;
-      });
+      } else {
+        // Normal single heart pop
+        popRandomHeart();
+      }
     }, 4000);
 
     return () => clearInterval(interval);

@@ -2,12 +2,12 @@ import { useState, useCallback, useEffect } from 'react';
 
 /**
  * Stage definitions for the multi-stage Valentine experience
- * Flow: initial → hearts-popped → buttons-growing → yes-popped → marble-screen → celebrating
+ * Flow: initial → no-shrinking → yes-growing → yes-popped → marble-screen → celebrating
  */
 export type ValentineStage =
   | 'initial'           // Starting state with normal buttons
-  | 'hearts-popped'     // All hearts have popped, waiting before growth
-  | 'buttons-growing'   // Yes button growing, No button shrinking
+  | 'no-shrinking'      // No button shrinking and vanishing
+  | 'yes-growing'       // Yes button growing (after No vanishes)
   | 'yes-popped'        // Yes button reached full size and popped
   | 'marble-screen'     // Showing marble second chance screen
   | 'celebrating';      // Final celebration screen
@@ -15,6 +15,7 @@ export type ValentineStage =
 interface UseMultiStageValentineReturn {
   stage: ValentineStage;
   handleAllHeartsPoppedCallback: () => void;
+  handleNoButtonVanishedCallback: () => void;
   handleYesButtonFullCallback: () => void;
   handleBalloonPopComplete: () => void;
   handleMarbleYesClick: () => void;
@@ -43,19 +44,20 @@ export const useMultiStageValentine = (): UseMultiStageValentineReturn => {
 
   /**
    * Called when all floating hearts have been popped
-   * Initiates a 2.5 second delay before starting button growth
+   * Immediately starts No button shrinking animation
    */
   const handleAllHeartsPoppedCallback = useCallback(() => {
-    console.log('[State Machine] All hearts popped, waiting 2.5s before button growth');
-    setStage('hearts-popped');
+    console.log('[State Machine] All hearts popped, starting No button shrink');
+    setStage('no-shrinking');
+  }, []);
 
-    // After 2.5 second delay, start button growth animation
-    const timer = setTimeout(() => {
-      console.log('[State Machine] Starting button growth');
-      setStage('buttons-growing');
-    }, 2500);
-
-    setDelayTimer(timer);
+  /**
+   * Called when No button finishes shrinking and vanishes
+   * Starts Yes button growth animation
+   */
+  const handleNoButtonVanishedCallback = useCallback(() => {
+    console.log('[State Machine] No button vanished, starting Yes button growth');
+    setStage('yes-growing');
   }, []);
 
   /**
@@ -98,6 +100,7 @@ export const useMultiStageValentine = (): UseMultiStageValentineReturn => {
   return {
     stage,
     handleAllHeartsPoppedCallback,
+    handleNoButtonVanishedCallback,
     handleYesButtonFullCallback,
     handleBalloonPopComplete,
     handleMarbleYesClick,

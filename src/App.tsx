@@ -25,6 +25,7 @@ export default function App() {
   const {
     stage,
     handleAllHeartsPoppedCallback,
+    handleNoButtonVanishedCallback,
     handleYesButtonFullCallback,
     handleBalloonPopComplete,
     handleMarbleYesClick,
@@ -72,8 +73,8 @@ export default function App() {
 
       {/* Main content area - Multi-stage conditional rendering */}
       <AnimatePresence mode="wait">
-        {/* Initial stage and hearts-popped: Show normal buttons */}
-        {(stage === 'initial' || stage === 'hearts-popped') && (
+        {/* Initial stage: Show normal buttons */}
+        {stage === 'initial' && (
           <div
             key="initial-stage"
             style={{
@@ -96,6 +97,7 @@ export default function App() {
             {/* Valentine Buttons - Normal state */}
             <ButtonContainer
               stage={stage}
+              onNoButtonVanished={handleNoButtonVanishedCallback}
               onYesButtonFull={handleYesButtonFullCallback}
             >
               <YesButton onClick={() => {}} />
@@ -104,10 +106,10 @@ export default function App() {
           </div>
         )}
 
-        {/* Buttons growing stage: Show buttons with growth animation */}
-        {stage === 'buttons-growing' && (
+        {/* Animation stages: No button shrinking, then Yes button growing */}
+        {(stage === 'no-shrinking' || stage === 'yes-growing') && (
           <div
-            key="growing-stage"
+            key="animation-stage"
             style={{
               position: 'relative',
               zIndex: theme.zIndex.content,
@@ -125,9 +127,10 @@ export default function App() {
               Will you be my Valentine?
             </h1>
 
-            {/* Valentine Buttons - Growth state */}
+            {/* Valentine Buttons - Sequential animation */}
             <ButtonContainer
               stage={stage}
+              onNoButtonVanished={handleNoButtonVanishedCallback}
               onYesButtonFull={handleYesButtonFullCallback}
             >
               <YesButton onClick={() => {}} />

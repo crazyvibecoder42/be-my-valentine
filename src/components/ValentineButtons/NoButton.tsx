@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { theme } from '../../styles/theme';
 import { buttonVariants } from '../../styles/animations';
 import { useButtonEvasion } from '../../hooks/useButtonEvasion';
+import type { ValentineStage } from '../../hooks/useMultiStageValentine';
 
 // Button dimensions for evasion calculations
 const BUTTON_WIDTH = 120;
@@ -10,6 +11,7 @@ const BUTTON_HEIGHT = 50;
 
 interface NoButtonProps {
   scale?: number;
+  stage?: ValentineStage;
 }
 
 /**
@@ -17,15 +19,18 @@ interface NoButtonProps {
  * Uses vector math and Framer Motion for smooth, playful evasion behavior
  * Tracks real DOM position for accurate distance calculations
  */
-export default function NoButton({ scale = 1 }: NoButtonProps) {
+export default function NoButton({ scale = 1, stage = 'initial' }: NoButtonProps) {
   // Create ref for button element to track real position
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // Get evasion position from hook - disable evasion during growth
+  // Disable evasion during animation stages and after
+  const shouldDisableEvasion = stage === 'no-shrinking' || stage === 'yes-growing' || stage === 'yes-popped' || stage === 'marble-screen' || stage === 'celebrating';
+
+  // Get evasion position from hook
   const position = useButtonEvasion({
     buttonRef,
     buttonSize: { width: BUTTON_WIDTH, height: BUTTON_HEIGHT },
-    disabled: scale !== 1,
+    disabled: shouldDisableEvasion,
   });
 
   return (

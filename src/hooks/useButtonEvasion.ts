@@ -42,9 +42,8 @@ export function useButtonEvasion({
   const [buttonPosition, setButtonPosition] = useState<ButtonPosition>({ x: 0, y: 0 });
 
   useEffect(() => {
-    // Skip evasion if disabled
+    // Skip evasion updates if disabled (but keep current position)
     if (disabled) {
-      setButtonPosition({ x: 0, y: 0 });
       return;
     }
 

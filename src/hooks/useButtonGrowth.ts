@@ -7,23 +7,27 @@ interface ButtonGrowthState {
 }
 
 interface UseButtonGrowthOptions {
-  enabled: boolean;
-  onFull?: () => void;
+  stage: 'no-shrinking' | 'yes-growing' | 'other';
+  onNoVanished?: () => void;
+  onYesFull?: () => void;
 }
 
 /**
  * useButtonGrowth - Animates button growth/shrink at 60 FPS
  * Uses requestAnimationFrame for smooth, performant updates
  *
- * Growth formulas:
- * - Yes button: Exponential growth `1 + Math.pow(elapsedSeconds * 1.5, 1.8)`
- * - No button: Linear shrink `Math.max(0.3, 1 - (elapsedSeconds * 0.15))`
+ * Sequential animation:
+ * 1. 'no-shrinking': No button shrinks from 1 to 0 (2 seconds)
+ * 2. 'yes-growing': Yes button grows exponentially to ~20 scale
  *
- * Triggers callback when Yes button reaches ~20 scale (fills viewport)
+ * Triggers callbacks:
+ * - onNoVanished: when No button reaches scale 0
+ * - onYesFull: when Yes button reaches ~20 scale (fills viewport)
  */
 export function useButtonGrowth({
-  enabled,
-  onFull
+  stage,
+  onNoVanished,
+  onYesFull
 }: UseButtonGrowthOptions): ButtonGrowthState {
   const [growthState, setGrowthState] = useState<ButtonGrowthState>({
     yesScale: 1,
@@ -33,19 +37,20 @@ export function useButtonGrowth({
 
   const animationFrameRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const hasTriggeredFullRef = useRef<boolean>(false);
+  const hasTriggeredNoVanishedRef = useRef<boolean>(false);
+  const hasTriggeredYesFullRef = useRef<boolean>(false);
 
   useEffect(() => {
-    // Only run animation when enabled
-    if (!enabled) {
-      // Reset state when disabled
+    // Reset state when not in animation stages
+    if (stage === 'other') {
       setGrowthState({
         yesScale: 1,
         noScale: 1,
         isFull: false,
       });
       startTimeRef.current = null;
-      hasTriggeredFullRef.current = false;
+      hasTriggeredNoVanishedRef.current = false;
+      hasTriggeredYesFullRef.current = false;
       return;
     }
 
@@ -58,17 +63,35 @@ export function useButtonGrowth({
       // Calculate elapsed time in seconds
       const elapsedSeconds = (timestamp - startTimeRef.current) / 1000;
 
-      // Calculate scales using growth formulas
-      const yesScale = 1 + Math.pow(elapsedSeconds * 1.5, 1.8);
-      const noScale = Math.max(0.3, 1 - (elapsedSeconds * 0.15));
+      let yesScale = 1;
+      let noScale = 1;
+      let isFull = false;
 
-      // Check if Yes button has reached full screen (~20 scale)
-      const isFull = yesScale >= 20;
+      if (stage === 'no-shrinking') {
+        // No button shrinks from 1 to 0 over 2 seconds
+        noScale = Math.max(0, 1 - (elapsedSeconds / 2));
+        yesScale = 1; // Yes button stays normal
 
-      // Trigger callback once when reaching full screen
-      if (isFull && !hasTriggeredFullRef.current && onFull) {
-        hasTriggeredFullRef.current = true;
-        onFull();
+        // Trigger callback when No button vanishes
+        if (noScale === 0 && !hasTriggeredNoVanishedRef.current && onNoVanished) {
+          hasTriggeredNoVanishedRef.current = true;
+          onNoVanished();
+        }
+      } else if (stage === 'yes-growing') {
+        // No button stays vanished
+        noScale = 0;
+
+        // Yes button grows exponentially
+        yesScale = 1 + Math.pow(elapsedSeconds * 1.5, 1.8);
+
+        // Check if Yes button has reached full screen (~20 scale)
+        isFull = yesScale >= 20;
+
+        // Trigger callback once when reaching full screen
+        if (isFull && !hasTriggeredYesFullRef.current && onYesFull) {
+          hasTriggeredYesFullRef.current = true;
+          onYesFull();
+        }
       }
 
       // Update state
@@ -91,7 +114,7 @@ export function useButtonGrowth({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [enabled, onFull]);
+  }, [stage, onNoVanished, onYesFull]);
 
   return growthState;
 }
