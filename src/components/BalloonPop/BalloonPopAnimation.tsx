@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect } from 'react';
 import { theme } from '../../styles/theme';
+import { centerExplosion, sideCannons, sparkleBurst } from '../../utils/celebrationConfig';
 
 interface BalloonPopAnimationProps {
   onComplete: () => void;
@@ -22,25 +23,37 @@ const playPopSound = () => {
 };
 
 /**
- * BalloonPopAnimation - Transition animation from grown Yes button to marble screen
+ * BalloonPopAnimation - Spectacular transition from grown Yes button to marble screen
  *
- * Animation sequence (600ms total):
+ * Animation sequence (1200ms total):
  * 1. Play pop sound immediately
- * 2. Burst particles radiate outward (8 particles, 400ms)
- * 3. Fade to marble background (400ms, delay 200ms)
+ * 2. Full-screen confetti explosion (700+ particles, multi-layer bursts)
+ *    - Center explosion (immediate)
+ *    - Side cannons (100ms delay)
+ *    - Sparkle burst (300ms delay)
+ * 3. Fade to marble background (600ms, delay 800ms)
  * 4. Call completion callback
  */
 export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationProps) {
-  // Play pop sound when animation starts
+  // Trigger spectacular full-screen glitter explosion
   useEffect(() => {
     playPopSound();
+
+    // Layer 1: Center explosion (immediate)
+    centerExplosion();
+
+    // Layer 2: Side cannons (100ms delay)
+    setTimeout(sideCannons, 100);
+
+    // Layer 3: Sparkle burst (300ms delay)
+    setTimeout(sparkleBurst, 300);
   }, []);
 
-  // Call onComplete after full animation sequence (600ms)
+  // Call onComplete after full glitter sequence (1200ms)
   useEffect(() => {
     const timer = setTimeout(() => {
       onComplete();
-    }, 600);
+    }, 1200); // Increased from 600 to allow glitter to settle
 
     return () => clearTimeout(timer);
   }, [onComplete]);
@@ -60,46 +73,6 @@ export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationP
         pointerEvents: 'none',
       }}
     >
-      {/* Burst particles (8 particles radiating at 45-degree intervals) */}
-      {[...Array(8)].map((_, i) => {
-        const angle = i * 45; // 0, 45, 90, 135, 180, 225, 270, 315 degrees
-        const rad = (angle * Math.PI) / 180;
-        const distance = 100;
-
-        return (
-          <motion.div
-            key={`particle-${i}`}
-            style={{
-              position: 'absolute',
-              fontSize: '36px',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-            }}
-            initial={{
-              x: 0,
-              y: 0,
-              opacity: 0,
-              scale: 1,
-            }}
-            animate={{
-              x: Math.cos(rad) * distance,
-              y: Math.sin(rad) * distance,
-              opacity: [0, 1, 0],
-              scale: [1, 1.2, 0.5],
-              rotate: 360,
-            }}
-            transition={{
-              duration: 0.4,
-              delay: 0.2, // Start when pop begins
-              ease: 'easeOut',
-            }}
-          >
-            💕
-          </motion.div>
-        );
-      })}
-
       {/* Fade to marble background overlay */}
       <motion.div
         style={{
@@ -114,8 +87,8 @@ export default function BalloonPopAnimation({ onComplete }: BalloonPopAnimationP
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{
-          duration: 0.4,
-          delay: 0.4, // Start after pop completes (200ms inflate + 200ms delay)
+          duration: 0.6,
+          delay: 0.8, // Start fade after glitter peaks
           ease: 'easeInOut',
         }}
       />

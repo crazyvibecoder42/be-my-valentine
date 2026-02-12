@@ -82,7 +82,10 @@ export function useButtonGrowth({
         noScale = 0;
 
         // Yes button grows exponentially
-        yesScale = 1 + Math.pow(elapsedSeconds * 1.5, 1.8);
+        const rawScale = 1 + Math.pow(elapsedSeconds * 1.5, 1.8);
+
+        // Cap at 20 to prevent overshooting and oscillation
+        yesScale = Math.min(rawScale, 20);
 
         // Check if Yes button has reached full screen (~20 scale)
         isFull = yesScale >= 20;
@@ -91,6 +94,13 @@ export function useButtonGrowth({
         if (isFull && !hasTriggeredYesFullRef.current && onYesFull) {
           hasTriggeredYesFullRef.current = true;
           onYesFull();
+
+          // Stop animation loop when full screen reached
+          if (animationFrameRef.current !== null) {
+            cancelAnimationFrame(animationFrameRef.current);
+            animationFrameRef.current = null;
+            return; // Exit early to prevent further updates
+          }
         }
       }
 

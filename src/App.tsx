@@ -163,26 +163,6 @@ export default function App() {
           <CelebrationAnimation key="celebration" />
         )}
       </AnimatePresence>
-
-      {/* Debug: Current stage indicator (remove in production) */}
-      {import.meta.env.DEV && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            background: 'rgba(0,0,0,0.7)',
-            color: 'white',
-            padding: '10px 15px',
-            borderRadius: '8px',
-            fontSize: '12px',
-            fontFamily: 'monospace',
-            zIndex: 9999,
-          }}
-        >
-          Stage: {stage}
-        </div>
-      )}
     </div>
   );
 }
