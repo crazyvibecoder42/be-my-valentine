@@ -164,7 +164,7 @@ npm run build
 
 ## 💕 Made with Love
 
-Built with Claude Code using agent teams for parallel development.
+Built with AI Agents with human creativity 😉
 
 ---
 
