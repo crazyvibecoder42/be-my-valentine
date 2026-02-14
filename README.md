@@ -164,7 +164,7 @@ npm run build
 
 ## 💕 Made with Love
 
-Built with AI Agents with human creativity 😉
+Built with AI Agents using human creativity 😉
 
 ---
 
